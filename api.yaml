@@ -1,0 +1,268 @@
+basePath: /api
+definitions:
+  auth.AllKeys:
+    properties:
+      api_key:
+        type: string
+    type: object
+  inputmodel.ApplyFormInputModel:
+    properties:
+      administrative_area_1:
+        type: string
+      city_of_birth:
+        type: string
+      document_id:
+        type: string
+      email:
+        type: string
+      first_name:
+        example: John
+        type: string
+      landline_phone_number:
+        type: string
+      last_name:
+        example: Doe
+        type: string
+      locality:
+        type: string
+      mobile_phone_number:
+        type: string
+      monthly_income:
+        type: number
+      mother_maiden_name:
+        type: string
+      postal_code:
+        type: string
+      street_address_1:
+        type: string
+      sub_locality_1:
+        type: string
+    required:
+    - city_of_birth
+    - document_id
+    - email
+    - first_name
+    - landline_phone_number
+    - last_name
+    - locality
+    - mobile_phone_number
+    - monthly_income
+    - mother_maiden_name
+    - postal_code
+    - street_address_1
+    type: object
+  response.ErrorJSON:
+    properties:
+      errors:
+        type: error
+      message:
+        example: Bad Request
+        type: string
+      status:
+        description: status number ie 200, 400, 500
+        example: 400
+        type: integer
+    type: object
+  response.SuccessJSON:
+    properties:
+      data:
+        type: object
+      message:
+        example: OK
+        type: string
+      status:
+        description: status number ie 200, 400, 500
+        example: 200
+        type: integer
+    type: object
+host: core-api.test.honestbank.com
+info:
+  contact:
+    email: engineering@honestbank.com
+    name: API Support
+  description: |-
+    APIs to power a consumer-facing credit card frontend (mobile apps or websites).
+
+    This API should cover the entire customer lifecycle:
+
+    * Pre-application - find available cards/campaigns
+    * Apply for a credit card
+    * Check credit card application status
+    * Card account-related operations (viewing balances, transactions, statements)
+    * Lock/unlock card
+    * ...and more
+  license:
+    name: Honestbank
+  title: Credit Card Frontend API
+  version: 0.1.x
+paths:
+  /api/v0.1.x/application/apply:
+    post:
+      consumes:
+      - application/json
+      description: "A JSON form for applying a new card. Below is a list of required
+        fields in JSON body.\n\n- first_name: \n\t- `required`\n\t- `min: 1 - max:
+        150`\n\t- allowed `^[a-zA-Z]+[a-zA-Z,.\\-'\\s]*$`\n\t- not allowed `(,{2,}|\\.{2,}|\\-{2,}|'{2,}|\\s{2,})`\n-
+        last_name: \n\t- `required`\n\t- `min: 1 - max: 150`\n\t- allowed `^[a-zA-Z]+[a-zA-Z,.\\-'\\s]*$`\n\t-
+        not allowed `(,{2,}|\\.{2,}|\\-{2,}|'{2,}|\\s{2,})`\n- document_id: \n\t-
+        `required`\n\t- 16 digits KTP  `ppDDSSddmmyyssss`\n    \t- `ppDDSS` [0-9]\n
+        \   \t- `ddmmyy` [0-9] date of birth of the citizen (dd will be added by 40
+        for female)\n        \t- `ddmmyy` has to be a valid date\n        \t- [https://metacpan.org/pod/release/SHARYANTO/Business-ID-NIK-0.02/lib/Business/ID/NIK.pm](https://metacpan.org/pod/release/SHARYANTO/Business-ID-NIK-0.02/lib/Business/ID/NIK.pm)\n
+        \       \t- if `dd` >40 then, gender = Female\n        \t- if `dd` <40 then,
+        gender = Male\n    \t- `ssss` >0001\n- city_of_birth:\n\t- `required`\n\t-
+        `min: 1 - max: 150`\n\t- allowed `^[a-zA-Z]+[a-zA-Z,.\\-'\\s]*$`\n\t- not
+        allowed `(,{2,}|\\.{2,}|\\-{2,}|'{2,}|\\s{2,})`\n- mother_maiden_name\n\t-
+        `required`\n\t- `min: 1 - max: 150`\n\t- allowed `^[a-zA-Z]+[a-zA-Z,.\\-'\\s]*$`\n\t-
+        not allowed `(,{2,}|\\.{2,}|\\-{2,}|'{2,}|\\s{2,})`\n- email\n\t- `required`\n\t-
+        `https://github.com/asaskevich/govalidator/blob/master/patterns.go#L7`\n-
+        mobile_phone_number:\n\t- `required`\n\t- `google libphone`\n- landline_phone_number:\n\t-
+        `required`\n\t- `google libphone`\n- postal_code:\n\t- `required`\n\t- `string
+        numeric`\n\t- `length 5`\n\t- `>= 10000`\n- street_address_1\n\t- `required`\n\t-
+        `min: 1 - max: 300`\n\t- allowed `^[a-zA-Z0-9\\-\\(\\)\\;\\'\\\"\\:\\,\\./\\\\\\s]*`\n\t-
+        not allowed `(\\r|\\n)`\n- administrative_area_1\n\t- `min: 1 - max: 300`\n\t-
+        allowed `^[a-zA-Z0-9\\-\\(\\)\\;\\'\\\"\\:\\,\\./\\\\\\s]*`\n\t- not allowed
+        `(\\r|\\n)`\n- sub_locality_1\n\t- `min: 1 - max: 300`\n\t- allowed `^[a-zA-Z0-9\\-\\(\\)\\;\\'\\\"\\:\\,\\./\\\\\\s]*`\n\t-
+        not allowed `(\\r|\\n)`\n- locality\n\t- `required`\n\t- `min: 1 - max: 300`\n\t-
+        must be in the valid `postal_code`\n- monthly_income\n\t- `required`\n\t-
+        `number`\n\t- `min: 3,000,000 - max: 999,999,999`"
+      parameters:
+      - description: Specify language that client needed to display
+        in: header
+        name: Accept-Language
+        type: string
+      - description: Api key that application got from exchanging the key in /auth/key
+        in: header
+        name: Api-Key
+        required: true
+        type: string
+      - description: Application form
+        in: body
+        name: inputmodel.ApplyFormInputModel
+        required: true
+        schema:
+          $ref: '#/definitions/inputmodel.ApplyFormInputModel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 200 Success
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessJSON'
+            - properties:
+                data:
+                  type: string
+                message:
+                  type: string
+                status:
+                  type: string
+              type: object
+        "400":
+          description: 400 Malformed JSON
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.ErrorJSON'
+            - properties:
+                message:
+                  type: string
+                status:
+                  type: string
+              type: object
+        "401":
+          description: 401 Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.ErrorJSON'
+            - properties:
+                message:
+                  type: string
+                status:
+                  type: string
+              type: object
+        "422":
+          description: 422 Wrong field validations
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.ErrorJSON'
+            - properties:
+                message:
+                  type: string
+                status:
+                  type: string
+              type: object
+  /api/v0.1.x/auth/key:
+    get:
+      description: |-
+        This is the first endpoint that the application needed to call every time the application started for the first time. This API served for receiving a temporary key from applications and return them with real keys for further communication and also for other analytic platforms.
+        - `temporary key`: Hardcoded key in the application, this is for us to identify the version of the application and make sure that this request comes from our own application
+        - `real keys`: Combination of various keys that will be used in other communication. This includes `api_key` which is a secret that comes from Vault. The application needs to store this `api_key` in their storage and send them with the `access_token` in future communication with the API
+      parameters:
+      - description: Temporary key
+        in: header
+        name: Temp-Key
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessJSON'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth.AllKeys'
+                message:
+                  type: string
+                status:
+                  type: string
+              type: object
+  /api/v0.1.x/campaigns:
+    get:
+      description: |-
+        Get list of campaign that this user is eligible to apply.
+        This request needs 2 `Http Headers`
+      parameters:
+      - description: Specify language that client needed to display
+        in: header
+        name: Accept-Language
+        type: string
+      - description: Api key that application got from exchanging the key in /auth/key
+        in: header
+        name: Api-Key
+        required: true
+        type: string
+      - description: Specify language that client needed to display
+        in: header
+        name: Access-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessJSON'
+            - properties:
+                data:
+                  type: string
+                message:
+                  type: string
+                status:
+                  type: string
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.ErrorJSON'
+            - properties:
+                message:
+                  type: string
+                status:
+                  type: string
+              type: object
+swagger: "2.0"
